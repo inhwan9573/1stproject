@@ -8,8 +8,7 @@ heat <- heatdata %>%
   group_by(year) %>%
   summarise(열지수=mean(heatindex),최대열지수=max(heatindex))
 #view(heat)
-colnames(heat) <- c("년도", "평균열지수","최대열지수")
-view(heat)
+
 
 chilldata <- read.csv("./data/datawindchill.csv")
 #view(chilldata)
@@ -24,8 +23,8 @@ heat_chill <- heat_chill[,-c(4)]
 view(heat_chill)
 names(heat_chill)
 
-heat_chill[heat_chill$최대열지수 >= 34, "열지수범주"] = "덥다"
-heat_chill[heat_chill$최대열지수 < 34, "열지수범주"] = "안덥다"
+heat_chill[heat_chill$최대열지수 >= 33, "열지수범주"] = "덥다"
+heat_chill[heat_chill$최대열지수 < 33, "열지수범주"] = "안덥다"
 
 # 열지수범주_평균체감온도
 hcb1 <- heat_chill %>% ggplot(aes(x=열지수범주, y=평균체감온도, fill=열지수범주)) + geom_boxplot()
