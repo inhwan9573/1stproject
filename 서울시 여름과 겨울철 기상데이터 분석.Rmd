@@ -74,7 +74,6 @@ heat_df <- heatdata %>%
 # 변수 합치고 확인하기
 summer <- cbind(summer_df,heat_df)
 summer <- summer[,-c(18)]
-View(summer)
 ```
 
 ## 겨울철 데이터 만들기
@@ -108,21 +107,18 @@ winter_df <- djf %>%
                 겨울평균운량=mean(평균운량),겨울일조시간=mean(일조시간),
                 겨울평균풍속=mean(평균풍속),겨울최대풍속=mean(최대풍속))
 winter <- winter_df[,-c(1,9:17)]
-View(winter)
 ```
 
 ## 여름과 겨울철 데이터 합치기
 
 ```{r}
 summer_winter_df <- cbind(summer,winter)
-View(summer_winter_df)
 ```
 
 ## 데이터 정규화(with scale)
 
 ```{r}
 scale_df <- as.data.frame(scale(summer_winter_df[2:26]))
-View(scale_df)
 ```
 
 ## 독립변수(여름철 기상데이터)와 종속변수(겨울철 기온데이터) 비교분석을 위한 데이터 나누기
@@ -423,3 +419,415 @@ swpmi_var <- get_pca_var(swpmi_all_pca)
 swpmi_var
 corrplot(swpmi_var$cos2,is.corr = FALSE)
 ```
+
+### 주성분분석 Plot {.tabset .tabset-pills}
+#### 여름과 겨울평균기온 PCA plot
+```{r}
+set.seed(210)
+res.swa <- kmeans(swa_var$coord, centers = 6, nstart = 25)
+grp_swa <- as.factor(res.swa$cluster)
+
+fviz_pca_var(swa_all_pca, col.var = grp_swa, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+#### 여름과 겨울평균최고기온 PCA plot
+```{r}
+set.seed(210)
+res.swam <- kmeans(swam_var$coord, centers = 6, nstart = 25)
+grp_swam <- as.factor(res.swam$cluster)
+
+fviz_pca_var(swam_all_pca, col.var = grp_swam, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+#### 여름과 겨울평균극점최고기온 PCA plot
+```{r}
+set.seed(210)
+res.swapm <- kmeans(swapm_var$coord, centers = 6, nstart = 25)
+grp_swapm <- as.factor(res.swapm$cluster)
+
+fviz_pca_var(swapm_all_pca, col.var = grp_swapm, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+#### 여름과 겨울극점최고기온 PCA plot
+```{r}
+set.seed(210)
+res.swpm <- kmeans(swpm_var$coord, centers = 7, nstart = 25)
+grp_swpm <- as.factor(res.swpm$cluster)
+
+fviz_pca_var(swpm_all_pca, col.var = grp_swpm, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+#### 여름과 겨울평균최저기온 PCA plot
+```{r}
+set.seed(210)
+res.swami <- kmeans(swami_var$coord, centers = 6, nstart = 25)
+grp_swami <- as.factor(res.swami$cluster)
+
+fviz_pca_var(swami_all_pca, col.var = grp_swami, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+#### 여름과 겨울평균극점최저기온 PCA plot
+```{r}
+set.seed(210)
+res.swapmi <- kmeans(swapmi_var$coord, centers = 6, nstart = 25)
+grp_swapmi <- as.factor(res.swapmi$cluster)
+
+fviz_pca_var(swapmi_all_pca, col.var = grp_swapmi, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+#### 여름과 겨울극점최저기온 PCA plot
+```{r}
+set.seed(210)
+res.swpmi <- kmeans(swpmi_var$coord, centers = 6, nstart = 25)
+grp_swpmi <- as.factor(res.swpmi$cluster)
+
+fviz_pca_var(swpmi_all_pca, col.var = grp_swpmi, 
+             palette = "jco",
+             legend.title = "Cluster")
+```
+
+---
+
+## 다중회귀분석
+```{r}
+library(car)
+```
+다중공선성(vif)을 확인하고 값이 10이상인 변수를 제거한 뒤 단계적 선택법으로 회귀식을 추정하였습니다.
+그 결과, 겨울평균최고기온을 종속변수로 한 회귀식이 가장 유의하다고 판단되었습니다.(셋째자리에서 반올림)
+$$겨울평균최고기온 = -1.28(강수량) + 1.69(최소습도) + 1.03(일조시간) - 1.59(최대풍속)$$
+다른 회귀식은 유의하지 않고 종속변수에 대한 설명력이 부족하여 제외하였습니다.
+
+
+### 회귀식 추정 {.tabset .tabset-pills}
+#### 겨울평균기온 ~ summer
+```{r}
+model_swa <- lm(겨울평균기온 ~ . , data = summer_winter_average) #설명변수 다 넣어보기
+vif(model_swa) #다중공선성확인 (보통 10이상이면 변수제거)
+#다중공선성을 가진 변수를 제거한 후의 회귀식
+model_swa <- lm(겨울평균기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 +
+                    평균해면기압 + 평균운량 + 일조시간 + 평균풍속 + 최대풍속, data = summer_winter_average)
+summary(model_swa) #유의미한 변수를 찾아보려 하였지만 나타나지 않음
+step(model_swa, direction = "both" ) #both = 단계적 선택법으로 회귀식 추정
+model_swa <- lm(겨울평균기온 ~ 평균운량 + 일조시간, data=summer_winter_average)
+summary(model_swa)
+```
+
+#### 겨울평균최고기온 ~ summer
+```{r}
+#swam(회귀선은 유의하나 설명력이 낮은편이다. 그래도 이 회귀선이 가장 나음)
+model_swam <- lm(겨울평균최고기온 ~ . , data = summer_winter_average_max)
+vif(model_swam)
+model_swam <- lm(겨울평균최고기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 + 평균해면기압 +
+                           평균운량 + 일조시간 + 평균풍속 + 최대풍속, data = summer_winter_average_max)
+summary(model_swam)
+step(model_swam, direction = "both")
+model_swam <- lm(겨울평균최고기온 ~ 강수량 + 최소습도 + 일조시간 + 최대풍속
+                         , data = summer_winter_average_max)
+summary(model_swam)
+```
+
+#### 겨울평균극점최고기온 ~ summer
+```{r}
+#swapm(회귀선이 유의하지도 않고 설명력이 현저히 떨어짐)
+model_swapm <- lm(겨울평균극점최고기온 ~ . , data = summer_winter_average_pole_max)
+vif(model_swapm)
+model_swapm <- lm(겨울평균극점최고기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 + 평균해면기압 +
+                              평균운량 + 일조시간 + 평균풍속 + 최대풍속 , data = summer_winter_average_pole_max)
+summary(model_swapm)
+step(model_swapm, direction = "both")
+model_swapm <- lm(겨울평균극점최고기온 ~ 최소습도 + 평균운량 + 최대풍속 , data = summer_winter_average_pole_max)
+summary(model_swapm)
+```
+
+#### 겨울극점최고기온 ~ summer
+```{r}
+#swpm(어떤 설명변수도 종속변수를 설명할 수 없음)
+model_swpm <- lm(겨울극점최고기온 ~ . , data = summer_winter_pole_max)
+vif(model_swpm)
+model_swpm <- lm(겨울극점최고기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 + 평균해면기압 +
+                           평균운량 + 일조시간 + 평균풍속 + 최대풍속 , data = summer_winter_pole_max)
+summary(model_swpm)
+step(model_swpm, direction = "both")
+model_swpm <- lm(겨울극점최고기온 ~ 1 , data = summer_winter_pole_max)
+summary(model_swpm)
+```
+
+#### 겨울평균최저기온 ~ summer
+```{r}
+#swami(종속변수에 대한 설명력이 부족함)
+model_swami <- lm(겨울평균최저기온 ~ . , data = summer_winter_average_min)
+vif(model_swami)
+model_swami <- lm(겨울평균최저기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 + 평균해면기압 +
+                            평균운량 + 일조시간 + 평균풍속 + 최대풍속 , data = summer_winter_average_min)
+summary(model_swami)
+step(model_swami, direction = "both")
+model_swami <- lm(겨울평균최저기온 ~ 최소습도 + 평균운량 + 일조시간, data = summer_winter_average_min)
+summary(model_swami)
+```
+
+#### 겨울평균극점최저기온 ~ summer
+```{r}
+#swapmi(회귀선이 가까스로 유의하나 설명력이 부족함)
+model_swapmi <- lm(겨울평균극점최저기온 ~ . , data = summer_winter_average_pole_min)
+vif(model_swapmi)
+model_swapmi <- lm(겨울평균극점최저기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 + 평균해면기압 +
+                            평균운량 + 일조시간 + 평균풍속 + 최대풍속 ,
+                            data = summer_winter_average_pole_min)
+summary(model_swapmi)
+step(model_swapmi, direction = "both")
+model_swapmi <- lm(겨울평균극점최저기온 ~ 평균풍속, data = summer_winter_average_pole_min)
+summary(model_swapmi)
+```
+
+#### 겨울극점최저기온 ~ summer
+```{r}
+#swpmi(회귀선이 유의하지도 않고 설명력이 현저히 떨어짐)
+model_swpmi <- lm(겨울극점최저기온 ~ . , data = summer_winter_pole_min)
+vif(model_swpmi)
+model_swpmi <- lm(겨울극점최저기온 ~ 평균극점최저기온 + 극점최저기온 + 강수량 + 최소습도 + 평균해면기압 +
+                               평균운량 + 일조시간 + 평균풍속 + 최대풍속 ,
+                             data = summer_winter_pole_min)
+summary(model_swpmi)
+step(model_swpmi, direction = "both")
+model_swpmi <- lm(겨울극점최저기온 ~ 최소습도, data = summer_winter_pole_min)
+summary(model_swpmi)
+```
+
+---
+
+# 데이터 시각화
+```{r}
+library(hrbrthemes)
+```
+
+## 여름 {.tabset .tabset-pills}
+### 여름평균기온
+```{r}
+avg_summer_average <- (sum(as.numeric(summer$평균기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=평균기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_average, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 평균기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 여름평균최고기온
+```{r}
+avg_summer_average_max <- (sum(as.numeric(summer$평균최고기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=평균최고기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_average_max, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 평균최고기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 여름평균극점최고기온
+```{r}
+avg_summer_average_pole_max <- (sum(as.numeric(summer$평균극점최고기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=평균극점최고기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_average_pole_max, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 평균극점최고기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 여름극점최고기온
+```{r}
+avg_summer_pole_max <- (sum(as.numeric(summer$극점최고기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=극점최고기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_pole_max, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 극점최고기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 여름평균최저기온
+```{r}
+avg_summer_average_min <- (sum(as.numeric(summer$평균최저기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=평균최저기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_average_min, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 평균최저기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 여름평균극점최저기온
+```{r}
+avg_summer_average_pole_min <- (sum(as.numeric(summer$평균극점최저기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=평균극점최저기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_average_pole_min, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 평균극점최저기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 여름극점최저기온
+```{r}
+avg_summer_pole_min <- (sum(as.numeric(summer$극점최저기온))/30)
+summer %>%
+  ggplot(aes(x=년도, y=극점최저기온, group=1)) +
+  geom_line(color="red") +
+  geom_point(shape=24, color="black", fill="red", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_summer_pole_min, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 여름(6월-8월) 극점최저기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+---
+
+## 겨울 {.tabset .tabset-pills}
+```{r}
+colnames(winter_df)[1] <- "년도"
+```
+
+### 겨울평균기온
+```{r}
+avg_winter_average <- (sum(as.numeric(winter_df$겨울평균기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울평균기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_average, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 평균기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 겨울평균최고기온
+```{r}
+avg_winter_average_max <- (sum(as.numeric(winter_df$겨울평균최고기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울평균최고기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_average_max, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 평균최고기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 겨울평균극점최고기온
+```{r}
+avg_winter_average_pole_max <- (sum(as.numeric(winter_df$겨울평균극점최고기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울평균극점최고기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_average_pole_max, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 평균극점최고기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 겨울극점최고기온
+```{r}
+avg_winter_pole_max <- (sum(as.numeric(winter_df$겨울극점최고기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울극점최고기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_pole_max, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 극점최고기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 겨울평균최저기온
+```{r}
+avg_winter_average_min <- (sum(as.numeric(winter_df$겨울평균최저기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울평균최저기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_average_min, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 평균최저기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 겨울평균극점최저기온
+```{r}
+avg_winter_average_pole_min <- (sum(as.numeric(winter_df$겨울평균극점최저기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울평균극점최저기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_average_pole_min, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 평균극점최저기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+### 겨울평균극점최저기온
+```{r}
+avg_winter_pole_min <- (sum(as.numeric(winter_df$겨울극점최저기온))/30)
+winter_df %>%
+  ggplot(aes(x=년도, y=겨울극점최저기온, group=1)) +
+  geom_line(color="blue") +
+  geom_point(shape=25, color="black", fill="blue", size=5) +
+  theme_ipsum() +
+  geom_hline(yintercept = avg_winter_pole_min, linetype = 2, color = "grey35", size = 1) +
+  labs(title = "서울시 겨울(12월-2월) 극점최저기온",
+       subtitle = "1998 - 2018",
+       x = "년도", 
+       y = "기온") + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5 ))
+```
+
+---
