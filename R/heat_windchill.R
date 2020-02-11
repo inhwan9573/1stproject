@@ -24,8 +24,8 @@ heat_chill <- heat_chill[,-c(4)]
 view(heat_chill)
 names(heat_chill)
 
-heat_chill[heat_chill$최대열지수 >= 32, "열지수범주"] = "덥다"
-heat_chill[heat_chill$최대열지수 < 32, "열지수범주"] = "안덥다"
+heat_chill[heat_chill$최대열지수 >= 34, "열지수범주"] = "덥다"
+heat_chill[heat_chill$최대열지수 < 34, "열지수범주"] = "안덥다"
 
 # 열지수범주_평균체감온도
 hcb1 <- heat_chill %>% ggplot(aes(x=열지수범주, y=평균체감온도, fill=열지수범주)) + geom_boxplot()
