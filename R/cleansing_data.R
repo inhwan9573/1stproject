@@ -179,6 +179,7 @@ ggcorr(summer_winter_pole_min[,c(1:19)], name = "corr", label = TRUE)+
 
 #주성분분석
 library(factoextra)
+
 df_pca <- transform(summer_winter_df)
 all_pca <- prcomp(df_pca[,-1],cor=TRUE,scale=TRUE)
 summary(all_pca)
@@ -201,6 +202,7 @@ fviz_eig(swam_all_pca, addlabels=TRUE, ylim=c(0,50), geom = c("bar", "line"),
 all_var <- get_pca_var(all_pca)
 all_var
 library(corrplot)
+
 corrplot(all_var$cos2,is.corr = FALSE)
 
 swam_var <- get_pca_var(swam_all_pca)
