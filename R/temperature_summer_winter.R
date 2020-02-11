@@ -64,8 +64,8 @@ view(wdf)
 names(wdf)
 summer_winter_df <- cbind(sdf,wdf)
 
-summer_winter_df[summer_winter_df$평균극점최고기온 >= 32, "평균최고기온범주"] = "덥다"
-summer_winter_df[summer_winter_df$평균극점최고기온 < 32, "평균최고기온범주"] = "안덥다"
+summer_winter_df[summer_winter_df$평균극점최고기온 >= 34, "평균최고기온범주"] = "덥다"
+summer_winter_df[summer_winter_df$평균극점최고기온 < 34, "평균최고기온범주"] = "안덥다"
 
 view(summer_winter_df)
 
