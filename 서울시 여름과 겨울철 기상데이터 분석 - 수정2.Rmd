@@ -193,52 +193,6 @@ summer_winter_pole_min <- scale_df[,-c(19:24)]
 # 겨울 극점최저기온과 비교(25)
 ```
 
-### 데이터 구조확인 {.tabset}
-#### structure
-```{r}
-str(summer_winter_average)
-```
-```{r}
-str(summer_winter_average_max)
-```
-```{r}
-str(summer_winter_average_pole_max)
-```
-```{r}
-str(summer_winter_pole_max)
-```
-```{r}
-str(summer_winter_average_min)
-```
-```{r}
-str(summer_winter_average_pole_min)
-```
-```{r}
-str(summer_winter_pole_min)
-```
-
-#### summary
-```{r}
-summary(summer_winter_average)
-```
-```{r}
-summary(summer_winter_average_max)
-```
-```{r}
-summary(summer_winter_average_pole_max)
-```
-```{r}
-summary(summer_winter_pole_max)
-```
-```{r}
-summary(summer_winter_average_min)
-```
-```{r}
-summary(summer_winter_average_pole_min)
-```
-```{r}
-summary(summer_winter_pole_min)
-```
 
 ---
 
@@ -846,7 +800,7 @@ model_swa <- lm(겨울평균기온 ~ 여름평균운량 + 여름일조시간, da
 summary(model_swa)
 ```
 
-#### 겨울평균최고기온 ~ summer
+#### 겨울평균최고기온 ~ summer (최종선택)
 ```{r}
 #swam(회귀선은 유의하나 설명력이 낮은편이다. 그래도 이 회귀선이 가장 나음)
 model_swam <- lm(겨울평균최고기온 ~ . , data = summer_winter_average_max)
