@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1581580670277.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F690DD67",
+    "lastKnownWriteTime" : 1581580196,
+    "last_content_update" : 1581580778014,
+    "path" : "~/GitHub/1stproject/1stproject/여름의 기온이 겨울의 기온에 미치는 영향.Rmd",
+    "project_path" : "여름의 기온이 겨울의 기온에 미치는 영향.Rmd",
+    "properties" : {
+        "cursorPosition" : "290,17",
+        "last_setup_crc32" : "60EA0F75b9314eb",
+        "scrollLine" : "286"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
