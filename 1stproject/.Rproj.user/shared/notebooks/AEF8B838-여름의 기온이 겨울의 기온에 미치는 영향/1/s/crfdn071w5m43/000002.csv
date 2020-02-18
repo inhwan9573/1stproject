@@ -1,0 +1,1 @@
+"0","scale_df <- as.data.frame(scale(summer_winter_df[2:26]))"
