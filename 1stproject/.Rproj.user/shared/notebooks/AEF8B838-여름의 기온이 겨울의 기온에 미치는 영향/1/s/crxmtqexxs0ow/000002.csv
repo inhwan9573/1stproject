@@ -1,6 +1,0 @@
-"0","winter$year <- as.character(winter$year)"
-"0","summer_winter_df <- left_join(summer,winter)"
-"2","Joining, by = ""year"""
-"0","datatable(summer_winter_df, "
-"0","          caption = ""여름철-겨울철 기상데이터"", "
-"0","          filter=""top"")"

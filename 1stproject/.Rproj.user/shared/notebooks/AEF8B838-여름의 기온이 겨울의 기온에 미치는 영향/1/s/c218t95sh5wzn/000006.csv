@@ -1,4 +1,0 @@
-"0","# 라이브러리 불러오기"
-"0","library(tidyverse)"
-"0","# 전체 데이터 불러오기"
-"0","data <- read.csv(""./data/seoulsi.csv"")"

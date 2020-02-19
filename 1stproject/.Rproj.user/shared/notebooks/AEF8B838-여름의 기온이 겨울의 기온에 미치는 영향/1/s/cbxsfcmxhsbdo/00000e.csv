@@ -1,2 +1,0 @@
-"0","plot(heatcolddata$coldcount~heatcolddata$heatcount,"
-"0","     xlab='폭염특보 개수',ylab='한파특보 개수')"

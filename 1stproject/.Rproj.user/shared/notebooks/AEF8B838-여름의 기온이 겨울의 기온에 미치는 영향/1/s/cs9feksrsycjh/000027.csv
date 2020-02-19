@@ -1,1 +1,0 @@
-"0","abline(lm(winter_df$겨울평균기온~summer$여름평균기온))"

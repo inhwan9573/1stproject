@@ -1,2 +1,0 @@
-"0","plot(alldata$countchill~alldata$countheat,"
-"0","     xlab='체감온도 -10.5 이하인 날',ylab='열지수 32 이상인 날')"

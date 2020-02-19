@@ -1,0 +1,28 @@
+getwd()
+read.csv("./data/dataheatindex.csv",header=TRUE)
+
+df <- data.frame(name,age,species,stringsAsFactors = F)
+name <- c('ryan','apeach','neo','prodo','muzi')
+age <- c(10,12,13,13,5)
+species <- c('lion','peach','cat','dog','danmuzi')
+df
+
+df[df$age>=12,]
+subset(df,select=(age>=12))
+?subset
+colnam
+
+string <- c('apple','pineapple','APPLE','PINEAPPLE')
+string1 <- grep('apple',string)
+string2 <- grep('apple',string,ignore.case = T)
+string1
+string2
+grep('pine',string)
+
+li <- list(number=c(1,2,3,4),
+           character=c('a','b','c','d'),
+           na=c(NA,NA,NA,NA))
+  class(li[3])
+
+  matrix(1:9,nrow=3)  
+  

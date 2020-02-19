@@ -1,0 +1,6 @@
+"0","# 라이브러리 불러오기
+library(tidyverse)
+"
+"2","에러: package or namespace load failed for ‘tidyverse’ in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]):
+ ‘stringi’이라고 불리는 패키지가 없습니다
+"
